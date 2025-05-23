@@ -439,8 +439,8 @@ const Sales: React.FC = () => {
        // Ensure soldAt is a valid Date object before converting to Timestamp
        if (!saleFormData.soldAt || !(saleFormData.soldAt instanceof Date) || isNaN(saleFormData.soldAt.getTime())) {
            setSnackbar({ open: true, message: 'Please select a valid date and time.', severity: 'error' });
-           setLoading(false);
-           return;
+         setLoading(false);
+         return;
       }
 
       const saleRecordToSave = {
@@ -757,14 +757,14 @@ const Sales: React.FC = () => {
                getOptionLabel={(option) => option.name}
                value={inventoryItems.find(item => item.id === saleFormData.itemId) || null} // Set value based on itemId
                onChange={handleItemSelect} // Use the updated handler
-               disabled={!!editingSale} // Disable item selection when editing
+                 disabled={!!editingSale} // Disable item selection when editing
                renderInput={(params) => (
-                 <TextField
+             <TextField
                    {...params}
                    label="Select Item"
-                   margin="dense"
-                   fullWidth
-                   variant="outlined"
+              margin="dense"
+              fullWidth
+              variant="outlined"
                    error={!!validationErrors.itemId}
                    helperText={validationErrors.itemId}
                  />
@@ -805,7 +805,7 @@ const Sales: React.FC = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Current Stock: {inventoryItems.find(item => item.id === saleFormData.itemId)?.quantity || 0}
             </Typography>
-          )}
+           )}
 
           <TextField
             margin="dense"

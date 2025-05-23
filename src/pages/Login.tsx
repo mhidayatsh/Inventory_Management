@@ -54,16 +54,16 @@ const Login: React.FC = () => {
         try {
           // Create user document with default role
           await setDoc(userDocRef, {
-            uid: user.uid,
-            email: user.email,
-            role: 'staff', // Default role is staff
+          uid: user.uid,
+          email: user.email,
+          role: 'staff', // Default role is staff
             createdAt: Timestamp.now()
-          });
+        });
           console.log("New user document created in Firestore");
         } catch (docError) {
           console.error("Error creating user document:", docError);
           throw new Error("Failed to create user profile");
-        }
+      }
       } else {
         // Verify that existing user has a role
         const userData = userDocSnap.data();

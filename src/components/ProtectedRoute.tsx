@@ -27,19 +27,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
         return;
       }
 
-      try {
-        const role = await getUserRole(user.uid);
+        try {
+          const role = await getUserRole(user.uid);
         if (isMounted) {
           setUserRole(role);
           setError(null);
         }
-      } catch (error) {
-        console.error("Error fetching user role in ProtectedRoute: ", error);
+        } catch (error) {
+          console.error("Error fetching user role in ProtectedRoute: ", error);
         if (isMounted) {
           setUserRole(null);
           setError("Failed to verify user role. Please try logging in again.");
         }
-      } finally {
+        } finally {
         if (isMounted) {
           setIsRoleLoading(false);
         }
@@ -86,7 +86,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
   }
 
   // Render protected content
-  return <Outlet />;
+    return <Outlet />;
 };
 
 export default ProtectedRoute; 

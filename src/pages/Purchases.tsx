@@ -357,10 +357,10 @@ const Purchases: React.FC = () => {
       }));
       setValidationErrors(prev => ({ ...prev, itemId: undefined })); // Clear error
     } else { // Handles clearing the selection
-       setPurchaseFormData(prev => ({
-        ...prev,
+    setPurchaseFormData(prev => ({
+      ...prev,
         itemId: '',
-      }));
+    }));
        setValidationErrors(prev => ({ ...prev, itemId: 'Please select an item.' })); // Set error if selection is cleared
     }
   };
@@ -399,8 +399,8 @@ const Purchases: React.FC = () => {
       // Ensure purchasedAt is a valid Date object before converting to Timestamp
       if (!purchaseFormData.purchasedAt || !(purchaseFormData.purchasedAt instanceof Date) || isNaN(purchaseFormData.purchasedAt.getTime())) {
            setSnackbar({ open: true, message: 'Please select a valid date and time.', severity: 'error' });
-           setLoading(false);
-           return;
+         setLoading(false);
+         return;
       }
 
       const purchaseRecordToSave = {
@@ -713,8 +713,8 @@ const Purchases: React.FC = () => {
                options={inventoryItems}
                getOptionLabel={(option) => option.name}
                value={inventoryItems.find(item => item.id === purchaseFormData.itemId) || null} // Set value based on itemId
-               onChange={handleItemSelect}
-               disabled={!!editingPurchase}
+                 onChange={handleItemSelect}
+                 disabled={!!editingPurchase}
                renderInput={(params) => (
                  <TextField
                    {...params}
