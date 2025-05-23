@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Function to get the user's role from the 'users' collection
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
+    }
+
+    // Check if the user is authenticated and has a specific role
+    function hasRole(role) {
+      return request.auth != null && getUserRole(request.auth.uid) == role;
+    }
+
+    // Rules for the 'users' collection
+    match /users/{userId} {
+      // Allow authenticated users to read their own user document
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Also allow admins and staff to read ANY user document
+      allow read: if hasRole('admin') || hasRole('staff');
+      // Allow users to create their own document during login
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Allow only admins to update or delete user documents
+      allow update, delete: if hasRole('admin');
+    }
+
+    // Rules for the 'inventory' collection
+    match /inventory/{inventoryId} {
+      // Admins can read, create, update, and delete inventory items
+      allow read, create, update, delete: if hasRole('admin');
+      // Staff can read and create inventory items
+      allow read, create: if hasRole('staff');
+      // Staff can update quantity, name, category, price, lastUpdated, avgCost
+      allow update: if hasRole('staff') && 
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['quantity', 'name', 'category', 'price', 'lastUpdated', 'avgCost']);
+    }
+
+    // Rules for the 'sales' collection
+    match /sales/{saleId} {
+      // Admins can read, create, update, and delete sales
+      allow read, create, update, delete: if hasRole('admin');
+      // Staff can read and create sales
+      allow read, create: if hasRole('staff');
+      // Staff can update their own sales
+      allow update: if hasRole('staff') && 
+        request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // Rules for the 'purchases' collection
+    match /purchases/{purchaseId} {
+      // Admins can read, create, update, and delete purchases
+      allow read, create, update, delete: if hasRole('admin');
+      // Staff can read and create purchases
+      allow read, create: if hasRole('staff');
+      // Staff can update their own purchases
+      allow update: if hasRole('staff') && 
+        request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // Rules for the 'adjustments' collection
+    match /adjustments/{adjustmentId} {
+      // Admins can read, create, update, and delete adjustments
+      allow read, create, update, delete: if hasRole('admin');
+      // Staff can read and create adjustments
+      allow read, create: if hasRole('staff');
+      // Staff can update their own adjustments
+      allow update: if hasRole('staff') && 
+        request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // Rules for the 'reports' collection
+    match /reports/{reportId} {
+       // Admins can read, create, update, and delete reports
+      allow read, create, update, delete: if hasRole('admin');
+      // Staff can read and create basic reports
+      allow read, create: if hasRole('staff');
+      // Staff can update their own reports
+      allow update: if hasRole('staff') && 
+        request.resource.data.createdBy == request.auth.uid;
+    }
+
+    match /{document=**} {
+      // Default rule: Deny all access unless explicitly allowed above
+      allow read, write: if false;
+    }
+  }
+} 

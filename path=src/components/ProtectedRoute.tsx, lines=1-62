@@ -1,0 +1,62 @@
+import React, { useState, useEffect } from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, getUserRole } from '../config/firebase';
+import { CircularProgress, Box } from '@mui/material';
+
+interface ProtectedRouteProps {
+  requiredRole?: 'admin' | 'staff';
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
+  const [user, loading] = useAuthState(auth);
+  const [userRole, setUserRole] = useState<'admin' | 'staff' | null>(null);
+  const [isRoleLoading, setIsRoleLoading] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (user) {
+        setIsRoleLoading(true);
+        try {
+          const role = await getUserRole(user.uid);
+          setUserRole(role);
+        } catch (error) {
+          console.error("Error fetching user role in ProtectedRoute: ", error);
+          setUserRole(null);
+        } finally {
+          setIsRoleLoading(false);
+        }
+      } else {
+        setUserRole(null);
+        setIsRoleLoading(false);
+      }
+    };
+
+    fetchRole();
+  }, [user]);
+
+  if (loading || isRoleLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user) {
+    return <Outlet />;
+  }
+
+  return <Navigate to="/login" state={{ from: location }} replace />;
+};
+
+export default ProtectedRoute; 
